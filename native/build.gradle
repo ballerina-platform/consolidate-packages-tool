@@ -1,0 +1,86 @@
+/*
+ *  Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com)
+ *
+ *  WSO2 LLC. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ */
+
+plugins {
+    id 'checkstyle'
+    id 'com.github.spotbugs'
+}
+
+description = "Ballerina - Consolidate packages tool native code"
+
+configurations.all {
+    resolutionStrategy.preferProjectModules()
+}
+
+checkstyle {
+    toolVersion = "${checkstylePluginVersion}"
+}
+
+tasks.withType(Checkstyle).configureEach {
+    dependsOn ":build-config:checkstyle:downloadFile"
+    configFile = file("${rootProject.projectDir}/build-config/checkstyle/build/checkstyle.xml")
+    exclude '**/module-info.java'
+}
+
+spotbugs {
+    toolVersion = "${spotbugsToolVersion}"
+    excludeFilter = file("spotbugs-exclude.xml")
+}
+
+tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+}
+
+spotbugsMain {
+    jvmArgs = [ '-Xmx2048m' ]
+    def classLoader = plugins["com.github.spotbugs"].class.classLoader
+    def SpotBugsConfidence = classLoader.findLoadedClass("com.github.spotbugs.snom.Confidence")
+    def SpotBugsEffort = classLoader.findLoadedClass("com.github.spotbugs.snom.Effort")
+    effort = SpotBugsEffort.MAX
+    reportLevel = SpotBugsConfidence.LOW
+    it.reports {
+        xml.required = false
+        html.required = true
+    }
+    def excludeFile = file('spotbugs-exclude.xml')
+    if(excludeFile.exists()) {
+        it.excludeFilter = excludeFile
+    }
+}
+
+dependencies {
+    checkstyle project(':build-config:checkstyle')
+    checkstyle "com.puppycrawl.tools:checkstyle:${checkstylePluginVersion}"
+
+    implementation "org.ballerinalang:ballerina-lang:${ballerinaLangVersion}"
+    implementation "org.ballerinalang:ballerina-tools-api:${ballerinaLangVersion}"
+    implementation "org.ballerinalang:ballerina-cli:${ballerinaLangVersion}"
+    implementation "org.ballerinalang:toml-parser:${ballerinaLangVersion}"
+    implementation "info.picocli:picocli:${picocliVersion}"
+    testImplementation "org.testng:testng:${testngVersion}"
+}
+
+def distributionBinPath =  new File(project.projectDir.absolutePath).parent + "/build/target/extracted-distributions/jballerina-tools-zip/jballerina-tools-${ballerinaLangVersion}"
+
+test {
+    useTestNG()
+    systemProperty "ballerina.home", distributionBinPath
+}
