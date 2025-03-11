@@ -1,0 +1,21 @@
+NAME
+       ballerina-consolidate-packages-new - Create a consolidator package for the provided services
+
+
+SYNOPSIS
+       bal consolidate-packages new <comma-separated-list-of-services>
+
+
+DESCRIPTION
+       Creates a new package that consolidates the provided services into a single package.
+
+
+OPTIONS
+       --package-path
+           Creates the given path if it does not exist and initializes the Ballerina
+           package in it. If not provided, the package will be created in the current directory.
+
+
+EXAMPLES
+       Create a package to consolidate services 'myOrg/svc1' and 'myOrg/svc2'.
+           $ bal consolidate-packages new --package-path path/to/package myOrg/svc1,myOrg/svc2

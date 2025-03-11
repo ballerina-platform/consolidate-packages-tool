@@ -1,0 +1,21 @@
+NAME
+       ballerina-consolidate-packages - Consolidate services in to a single package
+
+SYNOPSIS
+       bal consolidate-packages <new>|<add>|<remove> [OPTIONS] <args>
+
+
+DESCRIPTION
+       Creates a new package that consolidates multiple services into a single package
+       or updates an existing consolidator package to add or remove services.
+
+
+EXAMPLES
+       Create a package to consolidate services 'myOrg/svc1' and 'myOrg/svc2'.
+           $ bal consolidate-packages new myOrg/svc1,myOrg/svc2
+
+       Add 'myOrg/svc3' to an existing consolidator package.
+           $ bal consolidate-packages add myOrg/svc3
+
+       Remove 'myOrg/svc2' from an existing consolidator package.
+           $ bal consolidate-packages remove myOrg/svc2
