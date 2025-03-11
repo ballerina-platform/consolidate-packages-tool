@@ -18,4 +18,4 @@ OPTIONS
 
 EXAMPLES
        Create a package to consolidate services 'myOrg/svc1' and 'myOrg/svc2'.
-           $ bal consolidate-packages new myOrg/svc1,myOrg/svc2
+           $ bal consolidate-packages new --package-path path/to/package myOrg/svc1,myOrg/svc2

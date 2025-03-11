@@ -44,18 +44,6 @@ public class CodeGeneratorTest {
         Assert.assertFalse(Files.exists(project.sourceRoot().resolve("generated")));
         codeGenerator.execute(toolContext);
 
-        // Verify the content in generated/consolidator_main.bal file
-        Path generatedMainBalPath = project.sourceRoot().resolve("generated/consolidator_main.bal");
-        Assert.assertTrue(Files.exists(generatedMainBalPath));
-        String consolidatorMainBal = """
-                import ballerina/log;
-                
-                public function main() {
-                    log:printInfo("Started all services");
-                }
-                """;
-        Assert.assertEquals(Files.readString(generatedMainBalPath), consolidatorMainBal);
-
         // Verify the content in generated/consolidator.bal file
         Path generatedImportsBal = project.sourceRoot().resolve("generated/consolidator.bal");
         Assert.assertTrue(Files.exists(generatedImportsBal));

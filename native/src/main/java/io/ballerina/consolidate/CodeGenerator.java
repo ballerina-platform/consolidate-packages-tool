@@ -45,8 +45,6 @@ public class CodeGenerator implements CodeGeneratorTool {
 
     @Override
     public void execute(ToolContext toolContext) {
-        toolContext.println("Running  build tool: " + toolContext.toolId());
-
         if (!toolContext.options().containsKey("services")) {
             DiagnosticInfo diagnosticInfo = new DiagnosticInfo(
                 "BTCE001", "No services provided in 'options' to generate the consolidator package",
@@ -64,15 +62,6 @@ public class CodeGenerator implements CodeGeneratorTool {
         try {
             Files.createDirectories(toolContext.outputPath());
             Files.writeString(toolContext.outputPath().resolve(CONSOLIDATOR_BAL_FILE), stringBuilder);
-
-            String consolidatorMainBal = """
-                import ballerina/log;
-                
-                public function main() {
-                    log:printInfo("Started all services");
-                }
-                """;
-            Files.writeString(toolContext.outputPath().resolve("consolidator_main.bal"), consolidatorMainBal);
         } catch (IOException e) {
             DiagnosticInfo diagnosticInfo = new DiagnosticInfo(
                 "BTCE002", "Error occurred while generating code", DiagnosticSeverity.ERROR);

@@ -122,9 +122,20 @@ public class NewSubCommand implements BLauncherCmd {
         }
         String toolEntry = "\n[[tool." + TOOL_NAME + "]]\n" + "id = " + "\"consolidatePackages1\"\n" +
                 "options.services = [" +
-                options + "]";
+                options + "]\n";
 
         Files.writeString(packagePath.resolve(Util.BALLERINA_TOML), toolEntry, StandardOpenOption.APPEND);
+
+        // Generate the main.bal
+        String consolidatorMainBal = """
+                import ballerina/log;
+                
+                public function main() {
+                    log:printInfo("Started all services");
+                }
+                """;
+        Files.writeString(packagePath.resolve("main.bal"), consolidatorMainBal);
+
         outStream.println("\nSuccessfully created the consolidator package at '" + this.packagePath + "'.\n");
         outStream.println("What's next?\n\t Execute 'bal build " + this.packagePath + "' to generate the executable.");
     }

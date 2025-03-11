@@ -24,6 +24,9 @@ import org.testng.annotations.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static io.ballerina.consolidate.TestUtil.getOutput;
 import static io.ballerina.consolidate.TestUtil.readOutput;
@@ -63,6 +66,27 @@ public class NewCommandTest {
         String buildLog = readOutput(console);
         String expected = getOutput(testResources.resolve("command-outputs"), "new.txt");
         Assert.assertTrue(buildLog.contains(expected), "Actual output:" + buildLog);
+
+        // Verify the content in the Ballerina.toml file
+        Path generatedBalToml = Paths.get(projectPath).resolve(Util.BALLERINA_TOML);
+        Assert.assertTrue(Files.exists(generatedBalToml));
+        String consolidatorToolEntry = """
+                [[tool.consolidate-packages]]
+                id = "consolidatePackages1"
+                options.services = ["myorg/service1","myorg/service2"]""";
+        Assert.assertTrue(Files.readString(generatedBalToml).contains(consolidatorToolEntry));
+
+        // Verify the content in the main.bal file
+        Path generatedMainBalPath = Paths.get(projectPath).resolve("main.bal");
+        Assert.assertTrue(Files.exists(generatedMainBalPath));
+        String consolidatorMainBal = """
+                import ballerina/log;
+                
+                public function main() {
+                    log:printInfo("Started all services");
+                }
+                """;
+        Assert.assertEquals(Files.readString(generatedMainBalPath), consolidatorMainBal);
         // TODO: enable this after fixing the offline resolution of tools
         // balBuildAfter(projectPath);
     }
