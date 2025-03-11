@@ -63,6 +63,7 @@ public class NewCommandTest {
         String buildLog = readOutput(console);
         String expected = getOutput(testResources.resolve("command-outputs"), "new.txt");
         Assert.assertTrue(buildLog.contains(expected), "Actual output:" + buildLog);
+        // TODO: enable this after fixing the offline resolution of tools
         // balBuildAfter(projectPath);
     }
 

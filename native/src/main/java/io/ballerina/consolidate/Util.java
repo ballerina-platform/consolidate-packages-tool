@@ -57,6 +57,7 @@ import java.util.stream.Collectors;
 public class Util {
     static final String TOOL_NAME = "consolidate-packages";
     static final String BALLERINA_TOML = "Ballerina.toml";
+    public static final String CONSOLIDATOR_BAL_FILE = "consolidator.bal";
     static final String NEW = "new";
     static final String ADD = "add";
     static final String REMOVE = "remove";
@@ -91,18 +92,20 @@ public class Util {
      static Set<String> getServices(TomlTableNode tomlTableNode) {
         Set<String> elements = new HashSet<>();
         TopLevelNode servicesNode = tomlTableNode.entries().get("services");
-        if (servicesNode.kind() != null && servicesNode.kind() == TomlType.KEY_VALUE) {
-            TomlKeyValueNode keyValueNode = (TomlKeyValueNode) servicesNode;
-            TomlValueNode valueNode = keyValueNode.value();
-            if (valueNode.kind() == TomlType.ARRAY) {
-                TomlArrayValueNode arrayValueNode = (TomlArrayValueNode) valueNode;
-                for (TomlValueNode value : arrayValueNode.elements()) {
-                    if (value.kind() == TomlType.STRING) {
-                        elements.add(((TomlStringValueNode) value).getValue());
-                    }
-                }
-            }
-        }
+         if (servicesNode.kind() == null || servicesNode.kind() != TomlType.KEY_VALUE) {
+             return elements;
+         }
+         TomlKeyValueNode keyValueNode = (TomlKeyValueNode) servicesNode;
+         TomlValueNode valueNode = keyValueNode.value();
+         if (valueNode.kind() != TomlType.ARRAY) {
+             return elements;
+         }
+         TomlArrayValueNode arrayValueNode = (TomlArrayValueNode) valueNode;
+         for (TomlValueNode value : arrayValueNode.elements()) {
+             if (value.kind() == TomlType.STRING) {
+                 elements.add(((TomlStringValueNode) value).getValue());
+             }
+         }
         return elements;
     }
 

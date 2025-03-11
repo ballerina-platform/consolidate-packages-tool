@@ -87,7 +87,7 @@ public class TestUtil {
 
      static void balBuildAfter(String projectPath, PrintStream printStream) throws IOException, InterruptedException {
         ProcessBuilder processBuilder = new ProcessBuilder(
-                System.getProperty(BALLERINA_HOME) + "/bin/bal", "build", projectPath);
+                System.getProperty(BALLERINA_HOME) + "/bin/bal", "build", "--offline", projectPath);
          processBuilder.redirectErrorStream(true);
          Process process = processBuilder.start();
          BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));

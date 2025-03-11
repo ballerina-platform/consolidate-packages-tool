@@ -50,7 +50,7 @@ public class NewSubCommand implements BLauncherCmd {
     @CommandLine.Parameters (arity = "0..1")
     private String servicesStr;
 
-    @CommandLine.Option(names = {"--package-path"}, defaultValue = "consolidator")
+    @CommandLine.Option(names = {"--package-path"})
     private String packagePath;
 
     @CommandLine.Option(names = {"--help"})

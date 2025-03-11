@@ -33,6 +33,8 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.ballerina.consolidate.Util.CONSOLIDATOR_BAL_FILE;
+
 /**
  * This class represents the code generator buildtool for the consolidator package.
  *
@@ -61,7 +63,7 @@ public class CodeGenerator implements CodeGeneratorTool {
         }
         try {
             Files.createDirectories(toolContext.outputPath());
-            Files.writeString(toolContext.outputPath().resolve("consolidator.bal"), stringBuilder);
+            Files.writeString(toolContext.outputPath().resolve(CONSOLIDATOR_BAL_FILE), stringBuilder);
 
             String consolidatorMainBal = """
                 import ballerina/log;

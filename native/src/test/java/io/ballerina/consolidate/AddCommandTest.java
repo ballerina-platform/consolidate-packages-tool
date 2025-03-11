@@ -77,7 +77,7 @@ public class AddCommandTest {
         String expected = getOutput(testResources.resolve("command-outputs"), "add-one-service.txt");
         Assert.assertTrue(buildLog.contains(expected), "Actual output:" + buildLog);
         // TODO: enable this after fixing the offline resolution of tools
-//        balBuildAfter(System.getProperty(USER_DIR));
+        // balBuildAfter(System.getProperty(USER_DIR));
     }
 
     @Test
@@ -89,7 +89,7 @@ public class AddCommandTest {
         String expected = getOutput(testResources.resolve("command-outputs"), "add-two-services.txt");
         Assert.assertTrue(buildLog.contains(expected), "Actual output:" + buildLog);
         // TODO: enable this after fixing the offline resolution of tools
-//        balBuildAfter(System.getProperty(USER_DIR));
+        // balBuildAfter(System.getProperty(USER_DIR));
     }
 
     @Test
