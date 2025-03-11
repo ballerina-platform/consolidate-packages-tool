@@ -27,6 +27,11 @@ configurations.all {
     resolutionStrategy.preferProjectModules()
 }
 
+processResources {
+    include '**/*'
+    filter { String line -> line.replace('${project.version}', "${project.version}")}
+}
+
 checkstyle {
     toolVersion = "${checkstylePluginVersion}"
 }
@@ -83,4 +88,5 @@ def distributionBinPath =  new File(project.projectDir.absolutePath).parent + "/
 test {
     useTestNG()
     systemProperty "ballerina.home", distributionBinPath
+    systemProperty "project.version", "${project.version}"
 }

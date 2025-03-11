@@ -23,37 +23,30 @@ import picocli.CommandLine;
 import java.io.PrintStream;
 
 /**
- * This class represents the "consolidate-packages" command.
+ * This class represents the "consolidate-packages version" subcommand.
  *
  * @since 0.1.0
  */
-@CommandLine.Command(name = Util.TOOL_NAME,
-        subcommands = {NewSubCommand.class, AddSubCommand.class, RemoveSubCommand.class, VersionSubCommand.class},
-        description = "Generates a Ballerina consolidator project for the given package"
-)
-public class ConsolidatePackagesCommand implements BLauncherCmd {
+@CommandLine.Command(name = "version", description = "Prints the version information of this tool")
+public class VersionSubCommand implements BLauncherCmd {
     private final PrintStream printStream;
 
-    @CommandLine.Option(names = {"--help"})
-    private boolean help;
-
-    public ConsolidatePackagesCommand() {
+    public VersionSubCommand() {
         this.printStream = System.out;
     }
 
-    public ConsolidatePackagesCommand(PrintStream printStream) {
+    public VersionSubCommand(PrintStream printStream) {
         this.printStream = printStream;
     }
 
-
     @Override
     public void execute() {
-        printStream.println(Util.getHelpText(getName()));
+        printStream.println(Util.getToolVersion());
     }
 
     @Override
     public String getName() {
-        return Util.TOOL_NAME;
+        return "";
     }
 
     @Override
@@ -65,6 +58,6 @@ public class ConsolidatePackagesCommand implements BLauncherCmd {
     }
 
     @Override
-    public void setParentCmdParser(picocli.CommandLine commandLine) {
+    public void setParentCmdParser(CommandLine commandLine) {
     }
 }
