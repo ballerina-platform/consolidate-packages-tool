@@ -3,7 +3,7 @@ NAME
 
 
 SYNOPSIS
-       bal consolidate-packages new <comma-separated-list-of-services>
+       bal consolidate-packages new --package-path <path> <comma-separated-list-of-services>
 
 
 DESCRIPTION
@@ -17,5 +17,5 @@ OPTIONS
 
 
 EXAMPLES
-       Create a package to consolidate services 'myOrg/svc1' and 'myOrg/svc2'.
-           $ bal consolidate-packages new --package-path path/to/package myOrg/svc1,myOrg/svc2
+       Create a package to consolidate services 'myorg/svc1' and 'myorg/svc2'.
+           $ bal consolidate-packages new --package-path path/to/package myorg/svc1,myorg/svc2

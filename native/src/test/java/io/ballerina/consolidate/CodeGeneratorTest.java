@@ -48,9 +48,9 @@ public class CodeGeneratorTest {
         Path generatedImportsBal = project.sourceRoot().resolve("generated/consolidator.bal");
         Assert.assertTrue(Files.exists(generatedImportsBal));
         String consolidatorBal = """
-                import myOrg/svc1 as _;
-                import myOrg/svc2 as _;
-                import myOrg/svc3 as _;
+                import myorg/svc1 as _;
+                import myorg/svc2 as _;
+                import myorg/svc3 as _;
                 """;
         Assert.assertEquals(Files.readString(generatedImportsBal), consolidatorBal);
     }

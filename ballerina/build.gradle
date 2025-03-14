@@ -17,7 +17,7 @@
  */
 import org.apache.tools.ant.taskdefs.condition.Os
 
-description = 'Ballerina - Consolidate Packages Tool'
+description = 'Ballerina - Consolidate packages Tool'
 
 def tomlVersion = stripBallerinaExtensionVersion("${project.version}")
 def ballerinaTomlFilePlaceHolder = new File("${project.rootDir}/build-config/resources/package/Ballerina.toml")
@@ -89,5 +89,10 @@ tasks.named('clean', Delete) {
 tasks.named('build') {
     dependsOn updateTomlFiles
     dependsOn commitTomlFiles
+    dependsOn ":native:build"
     dependsOn ballerinaBuild
+}
+
+tasks.named('ballerinaBuild') {
+    dependsOn ":native:build"
 }

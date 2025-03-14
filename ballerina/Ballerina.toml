@@ -1,7 +1,7 @@
 [package]
 org = "ballerinax"
 name = "tool_consolidate_package"
-version = "0.1.0"
+version = "1.0.0"
 distribution = "2201.12.0"
 authors = ["Ballerina"]
 keywords = ["consolidate-package", "consolidate", "consolidator"]

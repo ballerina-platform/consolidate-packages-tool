@@ -25,16 +25,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import static io.ballerina.consolidate.TestUtil.getOutput;
 import static io.ballerina.consolidate.TestUtil.readOutput;
-import static io.ballerina.consolidate.TestUtil.testResources;
 
 /**
- * Test cases for the consolidate-packages main help command.
+ * Test cases for the consolidate-packages version command.
  *
  * @since 0.1.0
  */
-public class ConsolidatePackagesCommandTest {
+public class VersionSubCommandTest {
     private ByteArrayOutputStream console;
     private PrintStream printStream;
 
@@ -45,15 +43,14 @@ public class ConsolidatePackagesCommandTest {
     }
 
     @Test
-    public void testHelp() throws IOException {
-        ConsolidatePackagesCommand consolidatePackagesCommand = new ConsolidatePackagesCommand(printStream);
+    public void testVersion() throws IOException {
+        VersionSubCommand versionSubCommand = new VersionSubCommand(printStream);
         try {
-            consolidatePackagesCommand.execute();
+            versionSubCommand.execute();
         } catch (Exception e) {
-            Assert.fail("Error occurred while executing the command");
+            Assert.fail("Error occurred while executing the version command");
         }
         String buildLog = readOutput(console);
-        String expected = getOutput(testResources.resolve("command-outputs"), "help-main.txt");
-        Assert.assertTrue(buildLog.contains(expected), "Help text mismatched");
+        Assert.assertEquals("consolidate-packages version " + System.getProperty("project.version") + "\n", buildLog);
     }
 }

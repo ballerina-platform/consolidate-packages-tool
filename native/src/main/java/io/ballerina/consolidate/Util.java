@@ -44,6 +44,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -55,6 +56,8 @@ import java.util.stream.Collectors;
  * @since 0.1.0
  */
 public class Util {
+
+    // Constants related to the tool implementation
     static final String TOOL_NAME = "consolidate-packages";
     static final String BALLERINA_TOML = "Ballerina.toml";
     public static final String CONSOLIDATOR_BAL_FILE = "consolidator.bal";
@@ -62,6 +65,11 @@ public class Util {
     static final String ADD = "add";
     static final String REMOVE = "remove";
     static final String HYPHEN = "-";
+
+    // Constants related to the consolidate-packages.properties file
+    private static final String UNKNOWN = "unknown";
+    public static final String TOOL_PROPERTIES_FILE = "consolidate-packages.properties";
+    public static final String TOOL_VERSION = "tool.version";
 
     private Util() {}
 
@@ -146,5 +154,21 @@ public class Util {
 
     static String getUsage(String subCmd) {
         return "Run 'bal consolidate-package " + subCmd + "--help' for usage.";
+    }
+
+    /**
+     * Get the version of the tool.
+     *
+     * @return version of the tool
+     */
+    public static String getToolVersion() {
+        String versionPrefix = "consolidate-packages version ";
+        try (InputStream inputStream = Util.class.getClassLoader().getResourceAsStream(TOOL_PROPERTIES_FILE)) {
+            Properties properties = new Properties();
+            properties.load(inputStream);
+            return versionPrefix + properties.getProperty(TOOL_VERSION);
+        } catch (Throwable ignore) {
+        }
+        return versionPrefix + UNKNOWN;
     }
 }

@@ -15,7 +15,7 @@ the package build.
 ```toml
 [package]
 org = "myorg"
-name = "consolidator"
+name = "myApp"
 version = "0.1.0"
 
 [[tool.consolidate-packages]]
@@ -39,17 +39,19 @@ bal tool pull consolidate-packages
 
 ##### Creating a new consolidator package
 ```
-$ bal consolidate-packages new --services myorg/svc1,myorg/svc2 [--name <package-name>]
+$ bal consolidate-packages new --package-path=myApp myorg/svc1,myorg/svc2
 ```
 
 ##### Adding new services to an existing package
+Execute the command below to from the package root directory.
 ```
-$ bal consolidate-packages add --services myorg/svc3,myorg/svc4
+$ bal consolidate-packages add myorg/svc3,myorg/svc4
 ```
 
 ##### Removing services from an existing package
+Execute the command below to from the package root directory.
 ```
-$ bal consolidate-packages remove --services myorg/svc2,myorg/svc3
+$ bal consolidate-packages remove myorg/svc2,myorg/svc3
 ```
 
 ## Building from the Source

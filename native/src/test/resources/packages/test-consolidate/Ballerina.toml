@@ -9,4 +9,4 @@ observabilityIncluded = true
 
 [[tool.consolidate-packages]]
 id = "consolidate1"
-options.services = ["myOrg/svc1", "myOrg/svc2", "myOrg/svc3"]
+options.services = ["myorg/svc1", "myorg/svc2", "myorg/svc3"]

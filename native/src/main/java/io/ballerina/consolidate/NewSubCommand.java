@@ -53,7 +53,7 @@ public class NewSubCommand implements BLauncherCmd {
     @CommandLine.Option(names = {"--package-path"})
     private String packagePath;
 
-    @CommandLine.Option(names = {"--help"})
+    @CommandLine.Option(names = {"--help", "-h"})
     private boolean help;
 
     public NewSubCommand() {
