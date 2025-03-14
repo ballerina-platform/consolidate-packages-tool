@@ -89,5 +89,10 @@ tasks.named('clean', Delete) {
 tasks.named('build') {
     dependsOn updateTomlFiles
     dependsOn commitTomlFiles
+    dependsOn ":native:build"
     dependsOn ballerinaBuild
+}
+
+tasks.named('ballerinaBuild') {
+    dependsOn ":native:build"
 }

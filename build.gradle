@@ -104,7 +104,6 @@ tasks.named('clean') {
 
 tasks.named('build') {
     dependsOn unpackJballerinaTools
-    dependsOn(":native:build")
     dependsOn(":ballerina:build")
 }
 
