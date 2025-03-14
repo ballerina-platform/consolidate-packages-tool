@@ -9,6 +9,7 @@ DESCRIPTION
        Adds the provided list of services to an existing consolidator package.
        This command must be run from the <package-root> directory.
 
+
 EXAMPLES
-       Add 'myOrg/svc3' and 'myOrg/svc4' services to the consolidator package.
-           $ bal consolidate-packages add myOrg/svc3,myOrg/svc4
+       Add 'myorg/svc3' and 'myorg/svc4' services to the consolidator package.
+           $ bal consolidate-packages add myorg/svc3,myorg/svc4

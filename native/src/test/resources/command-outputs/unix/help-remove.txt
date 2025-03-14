@@ -11,5 +11,5 @@ DESCRIPTION
 
 
 EXAMPLES
-       Remove 'myOrg/svc1' from the consolidator package.
-           $ bal consolidate-packages remove myOrg/svc1
+       Remove 'myorg/svc1' from the consolidator package.
+           $ bal consolidate-packages remove myorg/svc1
