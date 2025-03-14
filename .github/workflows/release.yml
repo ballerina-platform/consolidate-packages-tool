@@ -12,8 +12,5 @@ jobs:
     uses: ballerina-platform/ballerina-library/.github/workflows/release-package-connector-template.yml@main
     secrets: inherit
     with:
-      package-name: github
+      package-name: consolidate-packages-tool
       package-org: ballerinax
-      additional-build-flags: "-x :github-examples:build"
-      additional-release-flags: "-x :github-examples:build"
-      additional-publish-flags: "-x :github-examples:build"
