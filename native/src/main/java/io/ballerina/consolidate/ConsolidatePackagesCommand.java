@@ -34,7 +34,7 @@ import java.io.PrintStream;
 public class ConsolidatePackagesCommand implements BLauncherCmd {
     private final PrintStream printStream;
 
-    @CommandLine.Option(names = {"--help"})
+    @CommandLine.Option(names = {"--help", "-h"})
     private boolean help;
 
     public ConsolidatePackagesCommand() {

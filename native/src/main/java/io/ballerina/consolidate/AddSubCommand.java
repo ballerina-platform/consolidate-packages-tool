@@ -50,7 +50,7 @@ public class AddSubCommand implements BLauncherCmd {
     @CommandLine.Parameters (arity = "0..1")
     private String servicesStr;
 
-    @CommandLine.Option(names = {"--help"})
+    @CommandLine.Option(names = {"--help", "-h"})
     private boolean help;
 
     public AddSubCommand() {
