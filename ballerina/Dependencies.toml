@@ -9,9 +9,9 @@ distribution-version = "2201.12.0"
 
 [[package]]
 org = "ballerinax"
-name = "tool_consolidate_package"
+name = "tool_consolidate_packages"
 version = "1.0.0"
 modules = [
-	{org = "ballerinax", packageName = "tool_consolidate_package", moduleName = "tool_consolidate_package"}
+	{org = "ballerinax", packageName = "tool_consolidate_packages", moduleName = "tool_consolidate_packages"}
 ]
 
