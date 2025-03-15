@@ -17,15 +17,19 @@
  */
 import org.apache.tools.ant.taskdefs.condition.Os
 
+plugins {
+    id 'io.ballerina.plugin'
+}
+
 description = 'Ballerina - Consolidate packages Tool'
 
+def packageName = "tool_consolidate_packages"
+def packageOrg = "ballerinax"
 def tomlVersion = stripBallerinaExtensionVersion("${project.version}")
 def ballerinaTomlFilePlaceHolder = new File("${project.rootDir}/build-config/resources/package/Ballerina.toml")
 def balToolTomlFilePlaceHolder = new File("${project.rootDir}/build-config/resources/package/BalTool.toml")
 def ballerinaTomlFile = new File("$project.projectDir/Ballerina.toml")
 def balToolTomlFile = new File("$project.projectDir/BalTool.toml")
-
-def distributionBinPath =  new File(project.projectDir.absolutePath).parent + "/build/target/extracted-distributions/jballerina-tools-zip/jballerina-tools-${ballerinaLangVersion}/bin"
 
 def stripBallerinaExtensionVersion(String extVersion) {
     if (extVersion.matches(project.ext.timestampedVersionRegex)) {
@@ -41,7 +45,13 @@ def stripBallerinaExtensionVersion(String extVersion) {
     }
 }
 
-tasks.register('updateTomlFiles') {
+ballerina {
+    packageOrganization = packageOrg
+    module = packageName
+    langVersion = ballerinaLangVersion
+}
+
+task updateTomlFiles {
     // Update the Ballerina.toml and Dependencies.toml files
     doLast {
         def newConfig = ballerinaTomlFilePlaceHolder.text.replace("@project.version@", project.version)
@@ -54,48 +64,43 @@ tasks.register('updateTomlFiles') {
     }
 }
 
-tasks.register('commitTomlFiles') {
-    // Commit the Ballerina.toml and Dependencies.toml files
+task commitTomlFiles {
     doLast {
         project.exec {
             ignoreExitValue true
             if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                commandLine 'cmd', '/c', "git commit -m \"[Automated] Update the native jar versions\" Ballerina.toml Dependencies.toml"
+                commandLine 'cmd', '/c', "git commit -m \"[Automated] Update the native jar versions\" Ballerina.toml Dependencies.toml BalTool.toml"
             } else {
-                commandLine 'sh', '-c', "git commit -m '[Automated] Update the native jar versions' Ballerina.toml Dependencies.toml"
+                commandLine 'sh', '-c', "git commit -m '[Automated] Update the native jar versions' Ballerina.toml Dependencies.toml BalTool.toml"
             }
         }
     }
 }
 
-tasks.register('ballerinaBuild') {
-    doLast {
-        exec {
-            workingDir project.projectDir
-            if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                commandLine 'cmd', "/c", "$distributionBinPath/bal pack"
-            } else {
-                commandLine 'sh', "-c", "$distributionBinPath/bal pack"
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifact source: createArtifactZip, extension: 'zip'
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/ballerina-platform/tool-consolidate-packages")
+            credentials {
+                username = System.getenv("publishUser")
+                password = System.getenv("publishPAT")
             }
         }
     }
 }
 
-tasks.named('clean', Delete) {
-    delete buildDir
-    delete file("$project.projectDir/target")
-}
+updateTomlFiles.dependsOn copyStdlibs
 
-tasks.named('build') {
-    dependsOn updateTomlFiles
-    dependsOn commitTomlFiles
-    dependsOn ":native:build"
-    dependsOn ballerinaBuild
-}
+build.dependsOn "generatePomFileForMavenPublication"
+build.dependsOn ":native:build"
+test.dependsOn ":native:build"
 
-tasks.named('ballerinaBuild') {
-    dependsOn ":native:build"
-}
-
-publishToMavenLocal.dependsOn build
 publish.dependsOn build
+publishToMavenLocal.dependsOn build

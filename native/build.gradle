@@ -19,6 +19,7 @@
 plugins {
     id 'checkstyle'
     id 'com.github.spotbugs'
+    id 'java'
 }
 
 description = "Ballerina - Consolidate packages tool native code"
@@ -83,10 +84,11 @@ dependencies {
     testImplementation "org.testng:testng:${testngVersion}"
 }
 
-def distributionBinPath =  new File(project.projectDir.absolutePath).parent + "/build/target/extracted-distributions/jballerina-tools-zip/jballerina-tools-${ballerinaLangVersion}"
+def distributionBinPath =  new File(project.projectDir.absolutePath).parent + "/target/ballerina-runtime"
 
 test {
     useTestNG()
     systemProperty "ballerina.home", distributionBinPath
     systemProperty "project.version", "${project.version}"
 }
+
