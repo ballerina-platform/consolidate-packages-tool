@@ -1,2 +1,2 @@
-ballerina: 'service1': invalid service name. Required pattern is <org>/<package-name>
-ballerina: 'service2': invalid service name. Required pattern is <org>/<package-name>
+ballerina: 'service1': invalid service name. Required pattern is <org>/<package-name> or <org>/<package-name>:<version>
+ballerina: 'service2': invalid service name. Required pattern is <org>/<package-name> or <org>/<package-name>:<version>

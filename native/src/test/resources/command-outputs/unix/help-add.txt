@@ -10,6 +10,11 @@ DESCRIPTION
        This command must be run from the <package-root> directory.
 
 
+OPTIONS
+       --repository
+           Specify the repository to resolve the dependencies from.
+           Only 'local' and repositories specified in the Settings.toml are allowed.
+
 EXAMPLES
        Add 'myorg/svc3' and 'myorg/svc4' services to the consolidator package.
            $ bal consolidate-packages add myorg/svc3,myorg/svc4

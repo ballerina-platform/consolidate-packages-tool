@@ -38,7 +38,7 @@ import static io.ballerina.consolidate.TestUtil.testResources;
  *
  * @since 0.1.0
  */
-public class RemoveCommandTest {
+public class RemoveCommandTest extends TestUtil {
 
     String userDir = System.getProperty(USER_DIR);
     private ByteArrayOutputStream console;

@@ -18,7 +18,7 @@
 package io.ballerina.consolidate;
 
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -28,21 +28,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static io.ballerina.consolidate.TestUtil.getOutput;
-import static io.ballerina.consolidate.TestUtil.readOutput;
-import static io.ballerina.consolidate.TestUtil.testResources;
-
 /**
  * Test cases for the consolidate-packages new command.
  *
  * @since 0.1.0
  */
-public class NewCommandTest {
+public class NewCommandTest extends TestUtil {
 
     private ByteArrayOutputStream console;
     private PrintStream printStream;
 
-    @BeforeClass
+    @BeforeMethod
     public void setup() {
         this.console = new ByteArrayOutputStream();
         this.printStream = new PrintStream(this.console);

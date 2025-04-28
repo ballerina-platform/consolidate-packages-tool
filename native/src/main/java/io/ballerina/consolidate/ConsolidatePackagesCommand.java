@@ -37,6 +37,9 @@ public class ConsolidatePackagesCommand implements BLauncherCmd {
     @CommandLine.Option(names = {"--help", "-h"})
     private boolean help;
 
+    @CommandLine.Option(names = {"-v"})
+    private boolean version;
+
     public ConsolidatePackagesCommand() {
         this.printStream = System.out;
     }
@@ -48,6 +51,11 @@ public class ConsolidatePackagesCommand implements BLauncherCmd {
 
     @Override
     public void execute() {
+        if (version) {
+            VersionSubCommand versionSubCommand = new VersionSubCommand();
+            versionSubCommand.execute();
+            return;
+        }
         printStream.println(Util.getHelpText(getName()));
     }
 
