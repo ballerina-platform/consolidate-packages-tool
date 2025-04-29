@@ -19,6 +19,7 @@ package io.ballerina.consolidate;
 
 import io.ballerina.cli.BLauncherCmd;
 import io.ballerina.cli.cmd.CommandUtil;
+import io.ballerina.consolidate.model.Dependency;
 import io.ballerina.projects.PackageManifest;
 import io.ballerina.projects.ProjectException;
 import io.ballerina.projects.directory.BuildProject;
@@ -28,12 +29,13 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
 import static io.ballerina.consolidate.Util.ADD;
 import static io.ballerina.consolidate.Util.HYPHEN;
+import static io.ballerina.consolidate.Util.getDependencyEntries;
 
 /**
  * This class represents the "consolidate-packages add" sub command.
@@ -53,9 +55,13 @@ public class AddSubCommand implements BLauncherCmd {
     @CommandLine.Option(names = {"--help", "-h"})
     private boolean help;
 
+    @CommandLine.Option(names = {"--repository"})
+    private String repository;
+
     public AddSubCommand() {
         this.outStream = System.out;
         this.errStream = System.err;
+        this.exit = true;
     }
 
     public AddSubCommand(PrintStream printStream) {
@@ -79,9 +85,9 @@ public class AddSubCommand implements BLauncherCmd {
             return;
         }
 
-        Optional<Set<String>> services;
+        Optional<Set<Dependency>> services;
         try {
-            services = Util.getServices(servicesStr, ADD, errStream);
+            services = Util.getServices(servicesStr, repository, ADD, errStream);
             if (services.isEmpty()) {
                 CommandUtil.exitError(this.exit);
                 return;
@@ -99,9 +105,9 @@ public class AddSubCommand implements BLauncherCmd {
         }
     }
 
-    private void addServicesToProject(Set<String> services) throws IOException {
+    private void addServicesToProject(Set<Dependency> services) throws IOException {
         outStream.println("Updating the consolidator package to add");
-        for (String service : services) {
+        for (Dependency service : services) {
             outStream.println("\t" + service);
         }
 
@@ -112,17 +118,18 @@ public class AddSubCommand implements BLauncherCmd {
                         null, false);
                 CommandUtil.exitError(this.exit);
             }
-            Set<String> allServices = new HashSet<>();
+            Set<Dependency> allServices = new LinkedHashSet<>();
             for (PackageManifest.Tool tool : buildProject.currentPackage().manifest().tools()) {
                 if (Util.TOOL_NAME.equals(tool.type().value())) {
-                    Set<String> existingServices = Util.getServices(tool.optionsTable());
+                    Set<Dependency> existingServices = Util.getServices(tool.optionsTable());
                     allServices.addAll(existingServices);
                     break;
                 }
             }
             allServices.addAll(services);
             Path balTomlPath = buildProject.sourceRoot().resolve(Util.BALLERINA_TOML);
-            Util.replaceServicesArrayInToml(allServices, balTomlPath);
+            String dependencyEntries = repository == null ? "" : getDependencyEntries(services);
+            Util.replaceServicesArrayInToml(allServices, dependencyEntries, balTomlPath);
 
         } catch (ProjectException e) {
             CommandUtil.printError(this.errStream, "Current directory is not a valid Ballerina package",

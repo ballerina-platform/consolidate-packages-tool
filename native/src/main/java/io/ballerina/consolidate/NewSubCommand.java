@@ -19,6 +19,7 @@ package io.ballerina.consolidate;
 
 import io.ballerina.cli.BLauncherCmd;
 import io.ballerina.cli.cmd.CommandUtil;
+import io.ballerina.consolidate.model.Dependency;
 import picocli.CommandLine;
 
 import java.io.IOException;
@@ -35,6 +36,7 @@ import java.util.StringJoiner;
 import static io.ballerina.consolidate.Util.HYPHEN;
 import static io.ballerina.consolidate.Util.NEW;
 import static io.ballerina.consolidate.Util.TOOL_NAME;
+import static io.ballerina.consolidate.Util.getDependencyEntries;
 
 /**
  * This class represents the "consolidate-packages new" sub command.
@@ -52,6 +54,9 @@ public class NewSubCommand implements BLauncherCmd {
 
     @CommandLine.Option(names = {"--package-path"})
     private String packagePath;
+
+    @CommandLine.Option(names = {"--repository"})
+    private String repository;
 
     @CommandLine.Option(names = {"--help", "-h"})
     private boolean help;
@@ -84,9 +89,9 @@ public class NewSubCommand implements BLauncherCmd {
             outStream.println(Util.getHelpText(getName()));
             return;
         }
-        Set<String> services;
+        Set<Dependency> services;
         try {
-            Optional<Set<String>> optionalList = Util.getServices(servicesStr, NEW, errStream);
+            Optional<Set<Dependency>> optionalList = Util.getServices(servicesStr, repository, NEW, errStream);
             if (optionalList.isEmpty()) {
                 CommandUtil.exitError(this.exit);
                 return;
@@ -99,7 +104,8 @@ public class NewSubCommand implements BLauncherCmd {
         }
 
         try {
-            createProject(Paths.get(packagePath), services);
+            Path pkgPath = Paths.get(packagePath);
+            createProject(pkgPath, services);
         } catch (IOException | URISyntaxException e) {
             CommandUtil.printError(this.errStream, "Package creation failed, reason: " + e.getMessage(),
                     null, false);
@@ -107,9 +113,9 @@ public class NewSubCommand implements BLauncherCmd {
         }
     }
 
-    private void createProject(Path packagePath, Set<String> services) throws IOException, URISyntaxException {
+    private void createProject(Path packagePath, Set<Dependency> services) throws IOException, URISyntaxException {
         outStream.println("Generating the consolidator package for");
-        for (String service : services) {
+        for (Dependency service : services) {
             outStream.println("\t" + service);
         }
         Files.createDirectories(packagePath);
@@ -117,14 +123,17 @@ public class NewSubCommand implements BLauncherCmd {
         CommandUtil.initPackageByTemplate(packagePath, packageName, "default", true);
 
         StringJoiner options = new StringJoiner(",");
-        for (String service : services) {
+        for (Dependency service : services) {
             options.add("\"" + service + "\"");
         }
-        String toolEntry = "\n[[tool." + TOOL_NAME + "]]\n" + "id = " + "\"consolidatePackages1\"\n" +
+        String toolEntry = "\n[[tool." + TOOL_NAME + "]]\n" +
+                "id = " + "\"consolidatePackages1\"\n" +
                 "options.services = [" +
                 options + "]\n";
+        String dependencyEntries = repository == null ? "" : getDependencyEntries(services);
 
-        Files.writeString(packagePath.resolve(Util.BALLERINA_TOML), toolEntry, StandardOpenOption.APPEND);
+        Files.writeString(packagePath.resolve(Util.BALLERINA_TOML), toolEntry + dependencyEntries,
+                StandardOpenOption.APPEND);
 
         // Generate the main.bal
         String consolidatorMainBal = """

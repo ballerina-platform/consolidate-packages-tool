@@ -19,6 +19,7 @@ package io.ballerina.consolidate;
 
 import io.ballerina.cli.cmd.CommandUtil;
 import io.ballerina.cli.utils.FileUtils;
+import io.ballerina.consolidate.model.Dependency;
 import io.ballerina.projects.util.ProjectUtils;
 import io.ballerina.toml.semantic.TomlType;
 import io.ballerina.toml.semantic.ast.TomlArrayValueNode;
@@ -42,6 +43,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Properties;
@@ -73,12 +75,13 @@ public class Util {
 
     private Util() {}
 
-    static Optional<Set<String>> getServices(String services, String subCmd, PrintStream errStream)
+    static Optional<Set<Dependency>> getServices(String services, String repo, String subCmd, PrintStream errStream)
             throws IOException {
         if (services == null || services.isEmpty()) {
             CommandUtil.printError(errStream, "no services provided", getUsage(subCmd), false);
             return Optional.empty();
         }
+        Set<Dependency> dependencies = new LinkedHashSet<>();
         Set<String> serviceArray =  new LinkedHashSet<>(Arrays.asList(services.split(","))); ;
         Schema schema = Schema.from(FileUtils.readSchema(TOOL_NAME, Util.class.getClassLoader()));
         ArraySchema properties = (ArraySchema) schema.properties().get("services");
@@ -86,38 +89,58 @@ public class Util {
         if (optionalPattern.isEmpty()) {
             throw new IllegalStateException("unable to find the pattern for services in the tool schema");
         }
+        Pattern pattern = Pattern.compile(optionalPattern.get());
         boolean isValid = true;
         for (String service : serviceArray) {
-            if (!service.matches(optionalPattern.get())) {
+            Matcher matcher = pattern.matcher(service);
+            if (!matcher.matches()) {
                 String msg = properties.items().message().get("pattern");
                 CommandUtil.printError(errStream, "'" + service + "': " + msg, null, false);
                 isValid = false;
+                continue;
+            }
+            
+            String org = matcher.group(1);
+            String name = matcher.group(2);
+            if (repo == null) {
+                dependencies.add(new Dependency(org, name));
+            } else {
+                String version = matcher.group(3);
+                if (version == null) {
+                    CommandUtil.printError(errStream, "package creation failed. Service " + service
+                                    + " must contain the version when the repository is provided.",
+                            null, false);
+                    isValid = false;
+                }
+                dependencies.add(new Dependency(org, name, version, repo));
             }
         }
-        return isValid ? Optional.of(serviceArray) : Optional.empty();
+        return isValid ? Optional.of(dependencies) : Optional.empty();
     }
 
-     static Set<String> getServices(TomlTableNode tomlTableNode) {
-        Set<String> elements = new HashSet<>();
+     static Set<Dependency> getServices(TomlTableNode tomlTableNode) {
+        Set<Dependency> dependencies = new HashSet<>();
         TopLevelNode servicesNode = tomlTableNode.entries().get("services");
          if (servicesNode.kind() == null || servicesNode.kind() != TomlType.KEY_VALUE) {
-             return elements;
+             return dependencies;
          }
          TomlKeyValueNode keyValueNode = (TomlKeyValueNode) servicesNode;
          TomlValueNode valueNode = keyValueNode.value();
          if (valueNode.kind() != TomlType.ARRAY) {
-             return elements;
+             return dependencies;
          }
          TomlArrayValueNode arrayValueNode = (TomlArrayValueNode) valueNode;
+
          for (TomlValueNode value : arrayValueNode.elements()) {
              if (value.kind() == TomlType.STRING) {
-                 elements.add(((TomlStringValueNode) value).getValue());
+                 String[] values = ((TomlStringValueNode) value).getValue().split("/");
+                 dependencies.add(new Dependency(values[0], values[1]));
              }
          }
-        return elements;
+        return dependencies;
     }
 
-     static void replaceServicesArrayInToml(Set<String> allServices, Path balTomlPath)
+     static void replaceServicesArrayInToml(Set<Dependency> allServices, String dependencyEntries, Path balTomlPath)
             throws IOException {
         String content = Files.readString(balTomlPath);
         Pattern pattern = Pattern.compile("options\\.services\\s*=\\s*\\[(?:\\s*\"[^\"]+\"\\s*,?\\s*)+]",
@@ -127,8 +150,16 @@ public class Util {
             return;
         }
         String existingStr = matcher.group();
-        String replacementStr = "options.services = [\"" + String.join("\", \"", allServices) + "\"]";
-        String modifiedContent = content.replace(existingStr, replacementStr);
+        StringBuilder replacementStr = new StringBuilder("options.services = [");
+        for (Iterator<Dependency> iterator = allServices.iterator(); iterator.hasNext(); ) {
+            Dependency service = iterator.next();
+            replacementStr.append("\"").append(service).append("\"");
+            if (iterator.hasNext()) {
+                replacementStr.append(",");
+            }
+        }
+        replacementStr.append("]");
+        String modifiedContent = content.replace(existingStr, replacementStr) + dependencyEntries;
         Files.writeString(balTomlPath, modifiedContent, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
@@ -170,5 +201,17 @@ public class Util {
         } catch (Throwable ignore) {
         }
         return versionPrefix + UNKNOWN;
+    }
+
+    static String getDependencyEntries(Set<Dependency> services) {
+        StringBuilder repoEntries = new StringBuilder();
+        for (Dependency dependency : services) {
+            repoEntries.append("\n[[dependency]]\n")
+                    .append("org = \"").append(dependency.org()).append("\"\n")
+                    .append("name = \"").append(dependency.name()).append("\"\n")
+                    .append("version = \"").append(dependency.version().orElseThrow()).append("\"\n")
+                    .append("repository = \"").append(dependency.repository().orElseThrow()).append("\"\n");
+        }
+        return repoEntries.toString();
     }
 }

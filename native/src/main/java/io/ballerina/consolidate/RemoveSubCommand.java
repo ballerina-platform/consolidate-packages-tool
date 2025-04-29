@@ -19,6 +19,7 @@ package io.ballerina.consolidate;
 
 import io.ballerina.cli.BLauncherCmd;
 import io.ballerina.cli.cmd.CommandUtil;
+import io.ballerina.consolidate.model.Dependency;
 import io.ballerina.projects.PackageManifest;
 import io.ballerina.projects.ProjectException;
 import io.ballerina.projects.directory.BuildProject;
@@ -79,9 +80,9 @@ public class RemoveSubCommand implements BLauncherCmd {
             outStream.println(Util.getHelpText(getName()));
             return;
         }
-        Optional<Set<String>> services;
+        Optional<Set<Dependency>> services;
         try {
-            services = Util.getServices(servicesStr, REMOVE, errStream);
+            services = Util.getServices(servicesStr, null, REMOVE, errStream);
             if (services.isEmpty()) {
                 CommandUtil.exitError(this.exit);
                 return;
@@ -100,11 +101,11 @@ public class RemoveSubCommand implements BLauncherCmd {
         }
     }
 
-    private void removeServicesFromProject(Set<String> services) throws IOException {
+    private void removeServicesFromProject(Set<Dependency> services) throws IOException {
         outStream.println("Updating the consolidator package to remove");
 
-        Set<String> rmServices = new HashSet<>();
-        for (String service : services) {
+        Set<Dependency> rmServices = new HashSet<>();
+        for (Dependency service : services) {
             outStream.println("\t" + service);
             rmServices.add(service);
         }
@@ -120,9 +121,9 @@ public class RemoveSubCommand implements BLauncherCmd {
             Path balTomlPath = buildProject.sourceRoot().resolve(Util.BALLERINA_TOML);
             for (PackageManifest.Tool tool : buildProject.currentPackage().manifest().tools()) {
                 if (Util.TOOL_NAME.equals(tool.type().value())) {
-                    Set<String> allServices = Util.getServices(tool.optionsTable());
+                    Set<Dependency> allServices = Util.getServices(tool.optionsTable());
                     allServices.removeAll(rmServices);
-                    Util.replaceServicesArrayInToml(allServices, balTomlPath);
+                    Util.replaceServicesArrayInToml(allServices, "", balTomlPath);
                    break;
                 }
             }

@@ -38,7 +38,7 @@ import static io.ballerina.consolidate.TestUtil.testResources;
  *
  * @since 0.1.0
  */
-public class AddCommandTest {
+public class AddCommandTest extends TestUtil {
 
     String userDir = System.getProperty(USER_DIR);
     private ByteArrayOutputStream console;
@@ -71,8 +71,8 @@ public class AddCommandTest {
     @Test
     public void testAddOneService() throws IOException, InterruptedException {
         String services = "myorg/service3";
-        AddSubCommand newSubCommand = new AddSubCommand(printStream, services, false);
-        newSubCommand.execute();
+        AddSubCommand addSubCommand = new AddSubCommand(printStream, services, false);
+        addSubCommand.execute();
         String buildLog = readOutput(console);
         String expected = getOutput(testResources.resolve("command-outputs"), "add-one-service.txt");
         Assert.assertTrue(buildLog.contains(expected), "Actual output:" + buildLog);

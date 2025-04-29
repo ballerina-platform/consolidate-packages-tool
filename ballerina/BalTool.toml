@@ -2,4 +2,4 @@
 id = "consolidate-packages"
 
 [[dependency]]
-path = "../native/build/libs/native-1.0.0-SNAPSHOT.jar"
+path = "../native/build/libs/native-1.1.0-SNAPSHOT.jar"
