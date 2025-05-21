@@ -123,7 +123,7 @@ public class RemoveSubCommand implements BLauncherCmd {
                 if (Util.TOOL_NAME.equals(tool.type().value())) {
                     Set<Dependency> allServices = Util.getServices(tool.optionsTable());
                     allServices.removeAll(rmServices);
-                    Util.replaceServicesArrayInToml(allServices, "", balTomlPath);
+                    Util.replaceServicesArrayInToml(allServices, "", balTomlPath, rmServices);
                    break;
                 }
             }
