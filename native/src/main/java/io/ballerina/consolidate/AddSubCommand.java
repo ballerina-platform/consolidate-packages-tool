@@ -129,7 +129,7 @@ public class AddSubCommand implements BLauncherCmd {
             allServices.addAll(services);
             Path balTomlPath = buildProject.sourceRoot().resolve(Util.BALLERINA_TOML);
             String dependencyEntries = repository == null ? "" : getDependencyEntries(services);
-            Util.replaceServicesArrayInToml(allServices, dependencyEntries, balTomlPath);
+            Util.replaceServicesArrayInToml(allServices, dependencyEntries, balTomlPath, null);
 
         } catch (ProjectException e) {
             CommandUtil.printError(this.errStream, "Current directory is not a valid Ballerina package",

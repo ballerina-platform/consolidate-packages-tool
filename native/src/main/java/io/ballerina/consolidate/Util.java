@@ -140,7 +140,8 @@ public class Util {
         return dependencies;
     }
 
-     static void replaceServicesArrayInToml(Set<Dependency> allServices, String dependencyEntries, Path balTomlPath)
+     static void replaceServicesArrayInToml(Set<Dependency> allServices, String dependencyEntries, Path balTomlPath,
+                                            Set<Dependency> rmServices)
             throws IOException {
         String content = Files.readString(balTomlPath);
         Pattern pattern = Pattern.compile("options\\.services\\s*=\\s*\\[(?:\\s*\"[^\"]+\"\\s*,?\\s*)+]",
@@ -160,6 +161,22 @@ public class Util {
         }
         replacementStr.append("]");
         String modifiedContent = content.replace(existingStr, replacementStr) + dependencyEntries;
+        if (rmServices != null && !rmServices.isEmpty()) {
+            for (Dependency service : rmServices) {
+                String dependencyRegex = "\\[\\[dependency]]\\s*" +
+                        "org\\s*=\\s*\"" + service.org() + "\"\\s*" +
+                        "name\\s*=\\s*\"" + service.name() + "\"\\s*" +
+                        "version\\s*=\\s*\"(.*?)\"\\s*" +
+                        "repository\\s*=\\s*\"(.*?)\"";
+                Pattern dependencyPattern = Pattern.compile(dependencyRegex);
+                Matcher dependencyMatcher = dependencyPattern.matcher(modifiedContent);
+                if (!dependencyMatcher.find()) {
+                    continue;
+                }
+                String existingDep = dependencyMatcher.group();
+                modifiedContent = modifiedContent.replace(existingDep, "");
+            }
+        }
         Files.writeString(balTomlPath, modifiedContent, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
