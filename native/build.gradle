@@ -65,6 +65,7 @@ spotbugsMain {
     it.reports {
         xml.required = false
         html.required = true
+        html.enabled true
     }
     def excludeFile = file('spotbugs-exclude.xml')
     if(excludeFile.exists()) {
