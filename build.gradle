@@ -66,9 +66,18 @@ subprojects {
     }
 }
 
-tasks.register('build') {
-    dependsOn(":native:build")
-    dependsOn(":ballerina:build")
+if (tasks.names.contains('build')) {
+    tasks.named('build') {
+        dependsOn(":native:build")
+        dependsOn(":ballerina:build")
+
+    }
+} else {
+    tasks.register('build') {
+        dependsOn(":native:build")
+        dependsOn(":ballerina:build")
+
+    }
 }
 
 def moduleVersion = project.version.replace("-SNAPSHOT", "")
